@@ -42,30 +42,26 @@ The basic neural network was made up of linear layers, ReLU activation
 layers, and a final Softmax activation layer. The exact layer
 architecture was:
 
-```{=html}
+
 <p align="center">
-```
-`<img src="assets/basic_nn_architecture.svg"
+<img src="assets/basic_nn_architecture.svg"
        alt="Basic Neural Network Architecture"
-       width="900">`{=html}
-```{=html}
+       width="900">
 </p>
-```
+
 ### Convolutional Neural Network
 
 The CNN was made up of convolutional layers, ReLU activation, max
 pooling layers, a flatten layer, linear layers, and a final Softmax
 activation layer. The exact layer architecture was:
 
-```{=html}
+
 <p align="center">
-```
-`<img src="assets/cnn_architecture.svg"
+  <img src="assets/cnn_architecture.svg"
        alt="Convolutional Neural Network Architecture"
-       width="900">`{=html}
-```{=html}
+       width="900">
 </p>
-```
+
 ## Training and Testing
 
 To train the models, I built my own data loader that loads the images
