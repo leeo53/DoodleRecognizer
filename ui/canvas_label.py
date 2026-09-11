@@ -1,6 +1,9 @@
 from PySide6 import QtCore, QtGui, QtWidgets
 from PySide6.QtCore import Qt
 class CanvasLabel(QtWidgets.QLabel):
+    '''
+    handles the doodling on the canvas
+    '''
 
     def __init__(self):
         super().__init__()

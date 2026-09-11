@@ -17,10 +17,10 @@ torch.manual_seed(42)
 if torch.cuda.is_available():
     torch.cuda.manual_seed_all(42)
 data_loader = ImageDataLoader(
-    128,
-    ["apple.npy", "airplane.npy"],
-    1000,
-    "data",
+    batch_size = 128,
+    classes = ["apple.npy", "airplane.npy"],
+    samples_per_class = 1000,
+    data_folder = "data",
     flatten=False
 )
 model = NeuralNetwork(
@@ -59,10 +59,16 @@ model.add_max_pooling_layer(
 
 model.add_flatten_layer()
 
-model.add_linear_layer(16 * 7 * 7, 64)
+model.add_linear_layer(
+    input_dim=16 * 7 * 7,
+    output_dim=64
+)
 model.add_ReLU_layer()
 
-model.add_linear_layer(64, 2)
+model.add_linear_layer(
+    input_dim=64,
+    output_dim=2
+)
 model.add_output_softmax_layer()
 
 model.run(False)

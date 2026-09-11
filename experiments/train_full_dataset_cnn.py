@@ -16,11 +16,12 @@ if torch.cuda.is_available():
     torch.cuda.manual_seed_all(42)
 
 data_loader = ImageDataLoader(
-    128,
-    None,
-    10000,
-    "data",
+    batch_size=128,
+    classes=None,
+    samples_per_class=10000,
+    data_folder = "data",
     flatten=False)
+
 model = NeuralNetwork(
     data_loader=data_loader,
     learning_rate=0.01,
@@ -29,61 +30,78 @@ model = NeuralNetwork(
 )
 
 model.add_convolution_layer(
-    1,
-    32,
-    3,
-    1,
-    1
+    in_channels=1,
+    out_channels=32,
+    kernel_size=3,
+    stride=1,
+    padding=1
 )
 model.add_ReLU_layer()
 
 model.add_convolution_layer(
-    32,
-    32,
-    3,
-    1,
-    1)
+    in_channels=32,
+    out_channels=32,
+    kernel_size=3,
+    stride=1,
+    padding=1
+)
 model.add_ReLU_layer()
 
-model.add_max_pooling_layer(2,2)
+model.add_max_pooling_layer(
+    kernel_size=2,
+    stride=2
+)
 
 model.add_convolution_layer(
-    32,
-    64,
-    3,
-    1,
-    1
+    in_channels=32,
+    out_channels=64,
+    kernel_size=3,
+    stride=1,
+    padding=1
 )
 model.add_ReLU_layer()
 
 model.add_convolution_layer(
-    64,
-    64,
-    3,
-    1,
-    1
+    in_channels=64,
+    out_channels=64,
+    kernel_size=3,
+    stride=1,
+    padding=1
 )
 model.add_ReLU_layer()
 
-model.add_max_pooling_layer(2,2)
+model.add_max_pooling_layer(
+    kernel_size=2,
+    stride=2
+)
 
 model.add_convolution_layer(
-    64,
-    128,
-    3,
-    1,
-    1
+    in_channels=64,
+    out_channels=128,
+    kernel_size=3,
+    stride=1,
+    padding=1
 )
 model.add_ReLU_layer()
 
-model.add_max_pooling_layer(2,2)
+model.add_max_pooling_layer(
+    kernel_size=2,
+    stride=2
+)
 
 model.add_flatten_layer()
 
-model.add_linear_layer(128*3*3,256)
+model.add_linear_layer(
+    input_dim=128 * 3 * 3,
+    output_dim=256
+)
 model.add_ReLU_layer()
 
-model.add_linear_layer(256,data_loader.num_classes)
+model.add_linear_layer(
+    input_dim=256,
+    output_dim=data_loader.num_classes
+)
+
 model.add_output_softmax_layer()
 
 model.file_name = "doodle_cnn.pkl"

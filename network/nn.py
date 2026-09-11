@@ -14,12 +14,16 @@ class NeuralNetwork:
     def __init__(self,
                  data_loader=None,
                  learning_rate=0.01,
-                 epochs=100, 
-                 batch_size=128):
+                 epochs=100):
+        '''
+        for the current implementation the softmax layer must always be added to the end of the model
+        :param data_loader: you can make this None and run the model without a data loader
+        :param learning_rate:
+        :param epochs:
+        '''
         self.layers = []
         self.learning_rate = learning_rate
         self.epochs = epochs
-        self.batch_size = batch_size
         self.output_size = 0
         self.class_names=None
         self.file_name = "model.pkl"
@@ -28,24 +32,49 @@ class NeuralNetwork:
             self.class_names = self.data_loader.classes
 
     def add_linear_layer(self, input_dim, output_dim):
+        '''
+        add a linear layer to the model as the next layer
+        :param input_dim: the input dimension
+        :param output_dim: the output dimension
+        '''
         self.layers.append(LinearLayer(input_dim=input_dim,
                                        neurons=output_dim,
                                        learning_rate=self.learning_rate))
         self.output_size = output_dim
 
     def add_ReLU_layer(self):
+        '''
+        add a ReLU layer to the model as the next layer
+        '''
         self.layers.append(ReLULayer())
 
     def add_sigmoid_layer(self):
+        '''
+        add a sigmoid layer to the model as the next layer
+        '''
         self.layers.append(SigmoidLayer())
 
     def add_tanh_layer(self):
+        '''
+        add a tanh layer to the model as the next layer
+        '''
         self.layers.append(TanhLayer())
 
     def add_output_softmax_layer(self):
+        '''
+        must be used as the last activation layer and nowhere else
+        '''
         self.layers.append(OutputSoftmaxLayer())
 
     def add_convolution_layer(self, in_channels, out_channels, kernel_size, stride, padding):
+        '''
+        adds a convolution layer to the model as the next layer
+        :param in_channels: input channels
+        :param out_channels: output channels
+        :param kernel_size:
+        :param stride:
+        :param padding:
+        '''
         self.layers.append(ConvLayer(
             in_channels=in_channels,
             out_channels=out_channels,
@@ -56,24 +85,45 @@ class NeuralNetwork:
         ))
 
     def add_max_pooling_layer(self, kernel_size, stride):
+        '''
+        add a max pooling layer to the model as the next layer
+        :param kernel_size:
+        :param stride:
+        '''
         self.layers.append(MaxPoolLayer(kernel_size, stride))
 
     def add_flatten_layer(self):
+        '''
+        add a flatten layer to the model as the next layer
+        '''
         self.layers.append(FlattenLayer())
 
     def forward(self, input):
+        '''
+        do one forward pass through the entire model
+        :param input: the input to the model
+        :return: the output of the model as probabilities
+        '''
         z=input
         for i,layer in enumerate(self.layers):
             z= layer.forward(z)
         return z
 
     def backward(self, targets):
+        '''
+        do one backward pass through the entire model updating the parameters
+        :param targets: the labels for the data
+        '''
         grad = targets
         for layer in reversed(self.layers):
             grad = layer.backward(grad)
 
     def fit_data_loader(self):
-        if len(self.layers) == 0:
+        '''
+        fit the model to the data from the data loader, can only be used if the data loader is not none
+        :return: 0 if successful, else -1
+        '''
+        if len(self.layers) == 0 or self.data_loader is None:
             return -1
 
         epoch_loss = torch.tensor(0.0, device=device)
@@ -133,6 +183,12 @@ class NeuralNetwork:
         return 0
 
     def fit(self, X, y):
+        '''
+        fits the model to the data X and y
+        :param X: input data
+        :param y: target values
+        :return: 0 if successful, else -1
+        '''
         if len(self.layers) == 0:
             return -1
         probs = self.forward(X)
@@ -171,10 +227,21 @@ class NeuralNetwork:
         return 0
 
     def cross_entropy_error(self, y, probs):
+        '''
+        returns the cross entropy error given the target values and the probabilities
+        :param y: target values
+        :param probs: probabilities returned by the model
+        :return: the cross entropy error
+        '''
         probs = torch.clamp(probs, 1e-15, 1.0)
         return -torch.sum(y * torch.log(probs))/y.shape[0]
 
     def run(self, save):
+        '''
+        fits the model to the data supplied by the data loader, and evaluates it against the testing data,
+        and saves it if save is True
+        :param save: saves the model to the file denoted by self.file_name if True
+        '''
         if self.data_loader is None:
             raise ValueError("Cannot run model because data_loader is None.")
 
@@ -188,6 +255,12 @@ class NeuralNetwork:
             self.save(self.file_name)
 
     def predict(self, input, k=5):
+        '''
+        sends the input through one forward pass and finds the top k predictions
+        :param input: input data
+        :param k: number of top predictions to return
+        :return: the names of the top k predictions, the probabilities of the top k predictions
+        '''
         probabilities = self.forward(input)
 
         top_probabilities, top_indices = torch.topk(
@@ -204,6 +277,10 @@ class NeuralNetwork:
         return predicted_names, top_probabilities
 
     def evaluate(self):
+        '''
+        uses the dataloader to check how the model performs on the testing data
+        :return: the loss with respect to the testing data, the accuracy on the testing data
+        '''
         correct = torch.tensor(0, device=device)
         total_loss = torch.tensor(0.0, device=device)
         total = 0
@@ -230,6 +307,10 @@ class NeuralNetwork:
         return test_loss, test_accuracy
 
     def save(self, filename):
+        '''
+        saves the model in a pickle file named filename
+        :param filename: name of the file
+        '''
         model_data = {
             "epochs": self.epochs,
             "learning_rate": self.learning_rate,
@@ -266,10 +347,19 @@ class NeuralNetwork:
 
             model_data["layers"].append(layer_data)
 
+        if not filename.endswith(".pkl"):
+            filename += ".pkl"
+
         with open(filename, "wb") as file:
             pickle.dump(model_data, file)
 
     def load(self, filename):
+        '''
+        loads the model from a pickle file named filename
+        :param filename: name of the file
+        '''
+        if not filename.endswith(".pkl"):
+            filename += ".pkl"
         with open(filename, "rb") as file:
             model_data = pickle.load(file)
         self.epochs = model_data["epochs"]

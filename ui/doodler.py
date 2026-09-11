@@ -138,6 +138,10 @@ class MainWindow(QtWidgets.QMainWindow):
 
 
     def guess_pressed(self):
+        '''
+        sends the doodle to the models and shows the top 5 predictions with probabilities in the
+        guesses section of the ui
+        '''
         image = self.canvas_label.pixmap().toImage()
 
         image = image.scaled(
@@ -199,6 +203,9 @@ class MainWindow(QtWidgets.QMainWindow):
                     """)
 
     def clear_pressed(self):
+        '''
+        clears the canvas and the guesses
+        '''
         canvas = QtGui.QPixmap(560, 560)
         canvas.fill(Qt.white)
         self.canvas_label.setPixmap(canvas)

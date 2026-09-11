@@ -10,6 +10,7 @@ class ImageDataLoader:
         :param classes: list of class file names, if classes is None all npy files in data folder are used
         :param samples_per_class: number of samples per class
         :param data_folder: path to the folder where the data is stored
+        :param flatten: whether to flatten the data
         """
         self.flatten = flatten
         self.batch_size = batch_size
@@ -42,10 +43,18 @@ class ImageDataLoader:
         self.num_classes = len(self.classes)
 
     def shuffle(self):
+        '''
+        shuffles the data
+        '''
         np.random.shuffle(self.train_samples)
         self.current_train_batch = 0
 
     def next_batch(self, train):
+        '''
+        returns the next batch of training data or testing data
+        :param train: determines whether to return training or testing data
+        :return: next batch of data
+        '''
         if train and self.current_train_batch*self.batch_size < self.train_samples.shape[0]:
             batch_X, batch_y = self._create_batch(self.current_train_batch, self.train_samples)
             self.current_train_batch += 1
@@ -60,6 +69,12 @@ class ImageDataLoader:
         return None, None
 
     def _create_batch(self, batch_index, samples):
+        '''
+        gets the batch X and y from the dataset given a batch index
+        :param batch_index: the index of the batch needed
+        :param samples: tuples of (class_idx, sample_idx)
+        :return: batch_X, batch_y from the dataset
+        '''
         start = batch_index * self.batch_size
         end = min(start + self.batch_size, samples.shape[0])
 

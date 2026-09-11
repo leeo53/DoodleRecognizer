@@ -2,12 +2,21 @@ import torch
 
 class MaxPoolLayer:
     def __init__(self, kernel_size, stride):
+        '''
+        :param kernel_size:
+        :param stride:
+        '''
         self.kernel_size = kernel_size
         self.stride = stride
         self.max_indices = None
         self.layer_input = None
 
     def forward(self, input):
+        '''
+        applies max pooling to the input tensor
+        :param input:
+        :return: pooled tensor
+        '''
         self.layer_input = input
         patches = (
             input
@@ -24,6 +33,10 @@ class MaxPoolLayer:
         return output
 
     def backward(self, grad_output):
+        '''
+        :param grad_output: the gradients of the loss with respect to the output of the layer
+        :return: the gradient of the loss with respect to the input of the layer
+        '''
         local_row = self.max_indices // self.kernel_size
         local_col = self.max_indices % self.kernel_size
 

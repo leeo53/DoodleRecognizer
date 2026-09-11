@@ -7,6 +7,15 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 class ConvLayer:
     def __init__(self,in_channels,out_channels,kernel_size,stride,padding, learning_rate):
+        '''
+        Convolution Layer
+        :param in_channels:
+        :param out_channels:
+        :param kernel_size:
+        :param stride:
+        :param padding:
+        :param learning_rate:
+        '''
         self.in_channels=in_channels
         self.out_channels=out_channels
         self.kernel_size=kernel_size
@@ -21,6 +30,10 @@ class ConvLayer:
         self.patches = None
 
     def initialize_kernels(self):
+        '''
+        Kaiming/He initialization of the kernels and initializing biases as zero
+        :return: the initialized kernels and biases
+        '''
         fan_in = self.in_channels * self.kernel_size * self.kernel_size
         std = sqrt(2 / fan_in)
         kernels=torch.randn(
@@ -33,8 +46,13 @@ class ConvLayer:
         biases = torch.zeros(self.out_channels, device=device, dtype=torch.float32)
         return kernels,biases
 
-    def forward(self, images):
-        padded_images = self.apply_padding(images)
+    def forward(self, inputs):
+        '''
+        forward pass including padding the images before applying convolution
+        :param inputs: (batch_size, in_channels, height, width)
+        :return: the feature maps after applying convolution
+        '''
+        padded_images = self.apply_padding(inputs)
         self.padded_input_images = padded_images
         self.patches = F.unfold(
             self.padded_input_images,
@@ -61,21 +79,32 @@ class ConvLayer:
         self.feature_maps = result + self.biases[None,:,None,None]
         return self.feature_maps
 
-    def apply_padding(self, images):
+    def apply_padding(self, inputs):
+        '''
+        apply padding to the inputs controlled by self.padding
+        :param inputs:
+        :return: the padded inputs
+        '''
         if self.padding != 0:
             padded = torch.zeros(
-                images.shape[0],
+                inputs.shape[0],
                 self.in_channels,
-                images.shape[2]+(self.padding*2),
-                images.shape[3]+(self.padding*2),
+                inputs.shape[2] + (self.padding * 2),
+                inputs.shape[3] + (self.padding * 2),
                 device=device,
                 dtype = torch.float32)
-            padded[:,:,self.padding:-self.padding,self.padding:-self.padding] = images
+            padded[:,:,self.padding:-self.padding,self.padding:-self.padding] = inputs
             return padded
         else:
-            return images
+            return inputs
 
     def backward(self,gradients):
+        '''
+        backward pass, this includes the update of kernels and biases using the gradients,
+        gradients are saved before update in self.grad_kernels and self.grad_biases
+        :param gradients: the gradients of the loss with respect to the output of the layer
+        :return: the gradients of the loss with respect to the input of the layer
+        '''
         gradients_wrt_biases = gradients.sum(dim=(0,2,3))
 
         flat_gradients = gradients.reshape(
