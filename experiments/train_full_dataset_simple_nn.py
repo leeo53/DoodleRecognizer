@@ -15,7 +15,7 @@ torch.manual_seed(42)
 if torch.cuda.is_available():
     torch.cuda.manual_seed_all(42)
 
-data_loader = ImageDataLoader(128, None, 1000, "data", True)
+data_loader = ImageDataLoader(128, None, 10000, "data", True)
 model = NeuralNetwork(
     data_loader=data_loader,
     learning_rate=0.01,
@@ -37,4 +37,4 @@ model.add_output_softmax_layer()
 
 model.file_name = "doodle_simple_nn.pkl"
 
-model.run(save=True)
+model.run(save=False)

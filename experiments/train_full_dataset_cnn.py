@@ -88,4 +88,4 @@ model.add_output_softmax_layer()
 
 model.file_name = "doodle_cnn.pkl"
 
-model.run(save=True)
+model.run(save=False)
