@@ -3,7 +3,8 @@
 This project compares how well a homemade convolutional neural network
 can recognize doodles to how well a homemade basic/simple neural network
 can do the same. I built both implementations myself from scratch using
-conceptual help from ChatGPT and tensors from PyTorch.
+conceptual help from ChatGPT and tensors from PyTorch.The project also 
+includes a UI to show the performance difference on your doodles.
 
 ## Project Motivations
 
