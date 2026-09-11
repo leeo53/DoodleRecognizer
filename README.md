@@ -76,8 +76,8 @@ cd DoodleRecognizer
 ```bash
 pip install -r requirements.txt
 ```
-Install PyTorch following an online guide to train the models you will want the GPU version but to just run the
-pretrained models CPU is fine
+Install PyTorch following an online guide. To train the models you will want the GPU version. To just run the
+pretrained models CPU will work and might be better.
 
 3. Download the dataset and put it in a folder named data in the repo (Optional)
 
